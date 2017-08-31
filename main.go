@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/geops/gtfsparser"
+	"github.com/patrickbr/gtfsparser"
 )
 
 const (
