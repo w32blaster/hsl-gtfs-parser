@@ -7,4 +7,5 @@ You can find the dump data [on the Reittiopas site](http://developer.reittiopas.
 This utility **HSL dump parser** parses data from Reittiopas and generates ready to use SQlite database. It can be used by any application, but I use it in the [Helsinki Timetables](https://github.com/w32blaster/helsinki-timetables) Android application.
 
 Used libraries:
-* https://github.com/geops/gtfsparser
+* https://github.com/patrickbr/gtfsparser
+* https://github.com/mattn/go-sqlite3

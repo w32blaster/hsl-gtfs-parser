@@ -48,7 +48,7 @@ func CreateSchema(db *sql.DB) bool {
 }
 
 // InsertCities : insert cities to the database
-func InsertCities(feed *parser.Feed, db *sql.DB) bool {
+func InsertCities(db *sql.DB) bool {
 
 	_, err := db.Exec("insert into city(_id, name) values(1, 'Helsinki'), (2, 'Espoo'), (3, 'Kauniainen'), (4, 'Vantaa'), (6, 'Kirkkonummi'), (9, 'Kerava')")
 	if err != nil {
@@ -76,9 +76,17 @@ func InsertCompanies(feed *parser.Feed, db *sql.DB) bool {
 	return true
 }
 
-// InsertVehicleTypes : insert cities to the database
-func InsertVehicleTypes() bool {
-	return false
+// InsertVehicleTypes : insert verhicle types. I found types in the docs
+// https://developers.google.com/transit/gtfs/reference/routes-file#route_type
+func InsertVehicleTypes(db *sql.DB) bool {
+
+	_, err := db.Exec("insert into vehicle_type(_id, name) values(0, 'Tram'), (1, 'Metro'), (2, 'Trains'), (3, 'Bus'), (4, 'Ferry'), (5, 'Cable Cars'), (6, 'Gondola'), (7, 'Funicular')")
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	return true
 }
 
 // InsertTransportModes : insert cities to the database

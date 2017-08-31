@@ -32,10 +32,13 @@ func main() {
 			len(feed.Agencies), len(feed.Stops), len(feed.Routes), len(feed.Trips), len(feed.FareAttributes))
 
 		// 1) insert cities
-		InsertCities(feed, db)
+		InsertCities(db)
 
 		// 2) insert companies
 		InsertCompanies(feed, db)
+
+		// 3) insert transport types
+		InsertVehicleTypes(db)
 
 	} else {
 		fmt.Println("Error in reading")
