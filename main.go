@@ -40,6 +40,11 @@ func main() {
 		// 3) insert transport types
 		InsertVehicleTypes(db)
 
+		// 4) insert all the transport Numbers and route names
+		InsertTransportNumbers(feed, db)
+
+		fmt.Println("Done")
+
 	} else {
 		fmt.Println("Error in reading")
 		fmt.Println(err)
