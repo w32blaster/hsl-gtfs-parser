@@ -32,15 +32,19 @@ func main() {
 			len(feed.Agencies), len(feed.Stops), len(feed.Routes), len(feed.Trips), len(feed.FareAttributes))
 
 		// 1) insert cities
+		fmt.Println("1) Insert sities")
 		InsertCities(db)
 
 		// 2) insert companies
+		fmt.Println("2) insert companies")
 		InsertCompanies(feed, db)
 
 		// 3) insert transport types
+		fmt.Println("3) insert transport types")
 		InsertVehicleTypes(db)
 
 		// 4) insert all the transport Numbers and route names
+		fmt.Println("4) instert transport numbers")
 		InsertTransportNumbers(feed, db)
 
 		fmt.Println("Done")

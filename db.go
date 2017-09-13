@@ -20,16 +20,16 @@ func CreateSchema(db *sql.DB) bool {
 	// (... ,transport_mode_id integer not null) from transport mode table
 
 	sqlStmt := `
-	DROP TABLE city;
-	DROP TABLE station;
-	DROP TABLE point;
-	DROP TABLE transport_number;
-	DROP TABLE vehicle_type;
-	DROP TABLE company;
-	DROP TABLE trip;
+	DROP TABLE IF EXISTS city;
+	DROP TABLE IF EXISTS station;
+	DROP TABLE IF EXISTS point;
+	DROP TABLE IF EXISTS transport_number;
+	DROP TABLE IF EXISTS vehicle_type;
+	DROP TABLE IF EXISTS company;
+	DROP TABLE IF EXISTS trip;
 
 	CREATE TABLE city (_id integer primary key autoincrement, name VARCHAR(30) not null);
-	CREATE TABLE station (_id integer primary key autoincrement, name VARCHAR(50) not null,city_id integer not null);
+	CREATE TABLE station (_id integer primary key, name VARCHAR(50) not null,city_id integer not null);
 	CREATE TABLE point (trip_id NUMERIC not null, station_id integer not null, time integer not null, idx integer not null);
 	CREATE TABLE transport_number (_id integer primary key autoincrement, name VARCHAR(30) not null,service_name VARCHAR(30) not null);
 	CREATE TABLE vehicle_type (_id integer primary key autoincrement, name VARCHAR(20) not null);
@@ -125,7 +125,27 @@ func InsertTransportNumbers(feed *parser.Feed, db *sql.DB) bool {
 }
 
 // InsertStations : insert cities to the database
-func InsertStations() bool {
+func InsertStations(feed *parser.Feed, db *sql.DB) bool {
+
+	tx, err := db.Begin()
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	stmt, err := tx.Prepare("INSERT INTO station (_id, name, city_id) VALUES (?, ?, ?)")
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	// insert stops (stations) to the database
+	for stopKey := range feed.Stops {
+		// hopefully, "zone_id" matches the old "cities" ID
+		stmt.Exec(feed.Stops[stopKey].Id, feed.Stops[stopKey].Name, feed.Stops[stopKey].Zone_id)
+	}
+	tx.Commit()
+
 	return false
 }
 
