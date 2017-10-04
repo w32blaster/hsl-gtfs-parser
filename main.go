@@ -47,6 +47,14 @@ func main() {
 		fmt.Println("4) instert transport numbers")
 		InsertTransportNumbers(feed, db)
 
+		// 5) stations
+		fmt.Println("5) insert stations")
+		InsertStations(feed, db)
+
+		// 6) points
+		fmt.Println("6) insert trips points (bus stops)")
+		InsertTripsAndPoints(feed, db)
+
 		fmt.Println("Done")
 
 	} else {

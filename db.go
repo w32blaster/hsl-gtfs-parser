@@ -2,11 +2,11 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 	parser "github.com/patrickbr/gtfsparser"
+	"github.com/patrickbr/gtfsparser/gtfs"
 )
 
 // CreateSchema : creates schema
@@ -65,10 +65,6 @@ func InsertCities(db *sql.DB) bool {
 // InsertCompanies : insert cities to the database
 func InsertCompanies(feed *parser.Feed, db *sql.DB) bool {
 
-	for k := range feed.Agencies {
-		fmt.Print(" - " + k)
-	}
-
 	_, err := db.Exec("insert into company(_id, name) values(1, '" + feed.Agencies["HSL"].Name + "')")
 	if err != nil {
 		log.Fatal(err)
@@ -121,7 +117,7 @@ func InsertTransportNumbers(feed *parser.Feed, db *sql.DB) bool {
 	}
 	tx.Commit()
 
-	return false
+	return true
 }
 
 // InsertStations : insert cities to the database
@@ -138,6 +134,7 @@ func InsertStations(feed *parser.Feed, db *sql.DB) bool {
 		log.Fatal(err)
 		return false
 	}
+	defer stmt.Close()
 
 	// insert stops (stations) to the database
 	for stopKey := range feed.Stops {
@@ -146,15 +143,67 @@ func InsertStations(feed *parser.Feed, db *sql.DB) bool {
 	}
 	tx.Commit()
 
-	return false
+	return true
 }
 
-// InsertTrips : insert cities to the database
-func InsertTrips() bool {
-	return false
+/*
+
+Insert Poits and Trip:
+1) load all the stop_times in a map, grouping by trip_id
+2) insert first and last stop to TRIP
+3) insert times to POINT
+
+*/
+
+// InsertTripsAndPoints : insert cities to the database
+func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB) bool {
+
+	//CREATE TABLE trip (_id integer primary key autoincrement, company_id integer not null,station_id_start integer not null,station_id_end integer not null,is_workday BOOLEAN not null,is_saturday BOOLEAN not null,is_sunday BOOLEAN not null,transport_number_id integer not null);
+	tx, err := db.Begin()
+
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	stmt, err := tx.Prepare("INSERT INTO trip (_id, company_id, station_id_start, station_id_end, is_workday, is_saturday, is_sunday, transport_number_id) VALUES (?,?,?,?,?,?,?,?)")
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+	defer stmt.Close()
+
+	id := 0
+	for tripKey := range feed.Trips {
+
+		// insert one trip
+		stationStart := feed.Trips[tripKey].StopTimes[0].Stop.Id
+		stopsCnt := len(feed.Trips[tripKey].StopTimes)
+		stationEnd := feed.Trips[tripKey].StopTimes[stopsCnt-1].Stop.Id
+
+		stmt.Exec(id, 1, stationStart, stationEnd, 0, 0, 0, -1)
+
+		// iterate over all stops and insert them
+		insertPoints(tx, feed.Trips[tripKey].StopTimes, id)
+
+		id++
+	}
+
+	tx.Commit()
+	return true
 }
 
-// InsertPoints : insert cities to the database
-func InsertPoints() bool {
-	return false
+// insert all the stop times (or, "points") for the given route
+func insertPoints(tx *sql.Tx, stops gtfs.StopTimes, tripID int) {
+
+	stmt, err := tx.Prepare("INSERT INTO point (trip_id, station_id, time, idx) VALUES (?, ?, ?, ?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	// iterate over all the stops and write them to the database
+	for _, stopTime := range stops {
+		stmt.Exec(tripID, stopTime.Stop.Id, stopTime.Arrival_time, stopTime.Sequence)
+	}
 }
