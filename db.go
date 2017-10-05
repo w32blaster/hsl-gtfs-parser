@@ -146,15 +146,6 @@ func InsertStations(feed *parser.Feed, db *sql.DB) bool {
 	return true
 }
 
-/*
-
-Insert Poits and Trip:
-1) load all the stop_times in a map, grouping by trip_id
-2) insert first and last stop to TRIP
-3) insert times to POINT
-
-*/
-
 // InsertTripsAndPoints : insert cities to the database
 func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB) bool {
 
@@ -173,20 +164,33 @@ func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB) bool {
 	}
 	defer stmt.Close()
 
-	id := 0
+	tripID := 0
 	for tripKey := range feed.Trips {
 
-		// insert one trip
+		// get the first and the last station in the current trip
 		stationStart := feed.Trips[tripKey].StopTimes[0].Stop.Id
 		stopsCnt := len(feed.Trips[tripKey].StopTimes)
 		stationEnd := feed.Trips[tripKey].StopTimes[stopsCnt-1].Stop.Id
 
-		stmt.Exec(id, 1, stationStart, stationEnd, 0, 0, 0, -1)
+		// find the dates (workdays, Saturday, Sunday)
+		isMonday := isWorkday(&feed.Trips[tripKey].Service.Daymap)
+		isSaturday := 0
+		if feed.Trips[tripKey].Service.Daymap[6] {
+			isSaturday = 1
+		}
+
+		isSunday := 0
+		if feed.Trips[tripKey].Service.Daymap[0] {
+			isSunday = 1
+		}
+
+		// insert one trip
+		stmt.Exec(tripID, 1, stationStart, stationEnd, isMonday, isSaturday, isSunday, -1)
 
 		// iterate over all stops and insert them
-		insertPoints(tx, feed.Trips[tripKey].StopTimes, id)
+		insertPoints(tx, feed.Trips[tripKey].StopTimes, tripID)
 
-		id++
+		tripID++
 	}
 
 	tx.Commit()
@@ -206,4 +210,13 @@ func insertPoints(tx *sql.Tx, stops gtfs.StopTimes, tripID int) {
 	for _, stopTime := range stops {
 		stmt.Exec(tripID, stopTime.Stop.Id, stopTime.Arrival_time, stopTime.Sequence)
 	}
+}
+
+// Showtcut method that returns 1 only when a trip is active in Wordays, 0 if not
+// please, refer to the mapping example here: https://github.com/geops/gtfsparser/blob/master/mapping.go#L93
+func isWorkday(dayMap *[7]bool) int {
+	if dayMap[1] || dayMap[2] || dayMap[3] || dayMap[4] || dayMap[5] {
+		return 1
+	}
+	return 0
 }
