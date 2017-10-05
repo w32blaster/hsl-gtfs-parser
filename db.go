@@ -94,30 +94,33 @@ func InsertTransportModes() bool {
 }
 
 // InsertTransportNumbers : insert cities to the database
-func InsertTransportNumbers(feed *parser.Feed, db *sql.DB) bool {
+func InsertTransportNumbers(feed *parser.Feed, db *sql.DB) *map[string]int {
+
+	mapRouteIds := make(map[string]int)
 
 	tx, err := db.Begin()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	stmt, err := tx.Prepare("insert into transport_number (name, service_name) values(?, ?)")
+	id := 0
+	stmt, err := tx.Prepare("insert into transport_number (_id, name, service_name) values(?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
-		return false
 	}
 	defer stmt.Close()
 
 	for routeKey := range feed.Routes {
-		_, err = stmt.Exec(feed.Routes[routeKey].Short_name, feed.Routes[routeKey].Long_name)
+		_, err = stmt.Exec(id, feed.Routes[routeKey].Short_name, feed.Routes[routeKey].Long_name)
 		if err != nil {
 			log.Fatal(err)
-			return false
 		}
+		mapRouteIds[feed.Routes[routeKey].Id] = id
+		id++
 	}
 	tx.Commit()
 
-	return true
+	return &mapRouteIds
 }
 
 // InsertStations : insert cities to the database
@@ -147,7 +150,7 @@ func InsertStations(feed *parser.Feed, db *sql.DB) bool {
 }
 
 // InsertTripsAndPoints : insert cities to the database
-func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB) bool {
+func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB, mapRouteIds *map[string]int) bool {
 
 	//CREATE TABLE trip (_id integer primary key autoincrement, company_id integer not null,station_id_start integer not null,station_id_end integer not null,is_workday BOOLEAN not null,is_saturday BOOLEAN not null,is_sunday BOOLEAN not null,transport_number_id integer not null);
 	tx, err := db.Begin()
@@ -185,7 +188,7 @@ func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB) bool {
 		}
 
 		// insert one trip
-		stmt.Exec(tripID, 1, stationStart, stationEnd, isMonday, isSaturday, isSunday, -1)
+		stmt.Exec(tripID, 1, stationStart, stationEnd, isMonday, isSaturday, isSunday, (*mapRouteIds)[feed.Trips[tripKey].Route.Id])
 
 		// iterate over all stops and insert them
 		insertPoints(tx, feed.Trips[tripKey].StopTimes, tripID)
