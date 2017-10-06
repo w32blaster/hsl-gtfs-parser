@@ -2,7 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"strconv"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	parser "github.com/patrickbr/gtfsparser"
@@ -120,6 +123,7 @@ func InsertTransportNumbers(feed *parser.Feed, db *sql.DB) *map[string]int {
 	}
 	tx.Commit()
 
+	fmt.Println("   inserted " + strconv.Itoa(len(feed.Routes)) + " transport numbers")
 	return &mapRouteIds
 }
 
@@ -146,13 +150,13 @@ func InsertStations(feed *parser.Feed, db *sql.DB) bool {
 	}
 	tx.Commit()
 
+	fmt.Println("   inserted " + strconv.Itoa(len(feed.Stops)) + " stations")
 	return true
 }
 
 // InsertTripsAndPoints : insert cities to the database
 func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB, mapRouteIds *map[string]int) bool {
 
-	//CREATE TABLE trip (_id integer primary key autoincrement, company_id integer not null,station_id_start integer not null,station_id_end integer not null,is_workday BOOLEAN not null,is_saturday BOOLEAN not null,is_sunday BOOLEAN not null,transport_number_id integer not null);
 	tx, err := db.Begin()
 
 	if err != nil {
@@ -197,12 +201,14 @@ func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB, mapRouteIds *map[string
 	}
 
 	tx.Commit()
+	fmt.Println("   inserted " + strconv.Itoa(len(feed.Trips)) + " trips")
 	return true
 }
 
 // insert all the stop times (or, "points") for the given route
-func insertPoints(tx *sql.Tx, stops gtfs.StopTimes, tripID int) {
+func insertPoints(tx *sql.Tx, stopTimes gtfs.StopTimes, tripID int) {
 
+	//CREATE TABLE point (trip_id NUMERIC not null, station_id integer not null, time integer not null, idx integer not null);
 	stmt, err := tx.Prepare("INSERT INTO point (trip_id, station_id, time, idx) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
@@ -210,7 +216,7 @@ func insertPoints(tx *sql.Tx, stops gtfs.StopTimes, tripID int) {
 	defer stmt.Close()
 
 	// iterate over all the stops and write them to the database
-	for _, stopTime := range stops {
+	for _, stopTime := range stopTimes {
 		stmt.Exec(tripID, stopTime.Stop.Id, stopTime.Arrival_time, stopTime.Sequence)
 	}
 }
@@ -221,5 +227,15 @@ func isWorkday(dayMap *[7]bool) int {
 	if dayMap[1] || dayMap[2] || dayMap[3] || dayMap[4] || dayMap[5] {
 		return 1
 	}
+	return 0
+}
+
+// in order to simplify the calculations, we
+// store time as ineger. So, 16:30 will be 1630, the 18:15 will be 1815.
+// This allows to draw timetables faster.
+// the current method takes the time and returns int that we expect to see
+func extractTime(time *time.Time) int {
+
+	// write tests for this method!!!
 	return 0
 }
