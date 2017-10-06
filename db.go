@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	parser "github.com/patrickbr/gtfsparser"
@@ -217,7 +216,7 @@ func insertPoints(tx *sql.Tx, stopTimes gtfs.StopTimes, tripID int) {
 
 	// iterate over all the stops and write them to the database
 	for _, stopTime := range stopTimes {
-		stmt.Exec(tripID, stopTime.Stop.Id, stopTime.Arrival_time, stopTime.Sequence)
+		stmt.Exec(tripID, stopTime.Stop.Id, extractTime(&stopTime.Arrival_time), stopTime.Sequence)
 	}
 }
 
@@ -234,8 +233,7 @@ func isWorkday(dayMap *[7]bool) int {
 // store time as ineger. So, 16:30 will be 1630, the 18:15 will be 1815.
 // This allows to draw timetables faster.
 // the current method takes the time and returns int that we expect to see
-func extractTime(time *time.Time) int {
-
-	// write tests for this method!!!
-	return 0
+// please refer to the unit tests
+func extractTime(time *gtfs.Time) int {
+	return (int(time.Hour) * 100) + int(time.Minute)
 }

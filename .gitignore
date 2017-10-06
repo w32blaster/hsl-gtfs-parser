@@ -17,3 +17,5 @@ HSL.zip
 
 db/helsinki_timetables.sqlite
 hsl-gtfs-parser
+
+vendor/*/

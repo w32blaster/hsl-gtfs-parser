@@ -1,0 +1,57 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "OFu4xJEIjiI8Suu+j/gabfp+y6Q=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "46b3c8225b20f01377eeefe3e6b7b147bb742eff",
+			"revisionTime": "2017-05-29T13:21:59Z"
+		},
+		{
+			"checksumSHA1": "izXmVfqtkWJ5iphedoJg7gJa/NE=",
+			"path": "github.com/hsl-gtfs-parser",
+			"revision": "6a31d1e67512d8756807f1d677c8e71170fa72fe",
+			"revisionTime": "2017-10-06T08:25:28Z"
+		},
+		{
+			"checksumSHA1": "bkkGN70qZCy8YaN89dqB1fONZJU=",
+			"path": "github.com/mattn/go-sqlite3",
+			"revision": "83772a7051f5e30d8e59746a9e43dfa706b72f3b",
+			"revisionTime": "2017-05-29T14:59:28Z"
+		},
+		{
+			"checksumSHA1": "LYKJISxnOfk8V/U/E6k16MkeZX4=",
+			"path": "github.com/patrickbr/gtfsparser",
+			"revision": "6e4f12215933aeb8ac2cab2c4823a1d17b6f95f5",
+			"revisionTime": "2017-07-19T21:37:55Z"
+		},
+		{
+			"checksumSHA1": "qZS7WHo289pKhIEMPkuVjp77ceI=",
+			"path": "github.com/patrickbr/gtfsparser/gtfs",
+			"revision": "6e4f12215933aeb8ac2cab2c4823a1d17b6f95f5",
+			"revisionTime": "2017-07-19T21:37:55Z"
+		},
+		{
+			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "46b3c8225b20f01377eeefe3e6b7b147bb742eff",
+			"revisionTime": "2017-05-29T13:21:59Z"
+		},
+		{
+			"checksumSHA1": "JrOt/M8No13ZxxdPhpTC7YUBWDY=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "46b3c8225b20f01377eeefe3e6b7b147bb742eff",
+			"revisionTime": "2017-05-29T13:21:59Z"
+		},
+		{
+			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",
+			"path": "golang.org/x/net/context",
+			"revision": "59a0b19b5533c7977ddeb86b017bf507ed407b12",
+			"revisionTime": "2017-06-03T08:13:02Z"
+		}
+	],
+	"rootPath": "github.com/hsl-gtfs-parser"
+}
