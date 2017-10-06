@@ -3,23 +3,23 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "OFu4xJEIjiI8Suu+j/gabfp+y6Q=",
+			"checksumSHA1": "mrz/kicZiUaHxkyfvC/DyQcr8Do=",
 			"origin": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
 			"path": "github.com/davecgh/go-spew/spew",
-			"revision": "46b3c8225b20f01377eeefe3e6b7b147bb742eff",
-			"revisionTime": "2017-05-29T13:21:59Z"
+			"revision": "ecdeabc65495df2dec95d7c4a4c3e021903035e5",
+			"revisionTime": "2017-10-02T20:02:53Z"
 		},
 		{
-			"checksumSHA1": "izXmVfqtkWJ5iphedoJg7gJa/NE=",
+			"checksumSHA1": "rjzryFC0SqhAolMhBBg+wraecS4=",
 			"path": "github.com/hsl-gtfs-parser",
-			"revision": "6a31d1e67512d8756807f1d677c8e71170fa72fe",
-			"revisionTime": "2017-10-06T08:25:28Z"
+			"revision": "87bd39fd4f6ff99f13fb5b11db53a24db99b8d27",
+			"revisionTime": "2017-10-06T18:02:18Z"
 		},
 		{
-			"checksumSHA1": "bkkGN70qZCy8YaN89dqB1fONZJU=",
+			"checksumSHA1": "vJOfjdXbjymKpuay2nyRnGncJUw=",
 			"path": "github.com/mattn/go-sqlite3",
-			"revision": "83772a7051f5e30d8e59746a9e43dfa706b72f3b",
-			"revisionTime": "2017-05-29T14:59:28Z"
+			"revision": "5160b48509cf5c877bc22c11c373f8c7738cdb38",
+			"revisionTime": "2017-09-28T04:00:20Z"
 		},
 		{
 			"checksumSHA1": "LYKJISxnOfk8V/U/E6k16MkeZX4=",
@@ -34,23 +34,23 @@
 			"revisionTime": "2017-07-19T21:37:55Z"
 		},
 		{
-			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
+			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
 			"origin": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
 			"path": "github.com/pmezard/go-difflib/difflib",
-			"revision": "46b3c8225b20f01377eeefe3e6b7b147bb742eff",
-			"revisionTime": "2017-05-29T13:21:59Z"
+			"revision": "792786c7400a136282c1664665ae0a8db921c6c2",
+			"revisionTime": "2016-01-10T10:55:54Z"
 		},
 		{
-			"checksumSHA1": "JrOt/M8No13ZxxdPhpTC7YUBWDY=",
+			"checksumSHA1": "mGbTYZ8dHVTiPTTJu3ktp+84pPI=",
 			"path": "github.com/stretchr/testify/assert",
-			"revision": "46b3c8225b20f01377eeefe3e6b7b147bb742eff",
-			"revisionTime": "2017-05-29T13:21:59Z"
+			"revision": "890a5c3458b43e6104ff5da8dfa139d013d77544",
+			"revisionTime": "2017-07-05T02:17:15Z"
 		},
 		{
-			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",
+			"checksumSHA1": "dr5+PfIRzXeN+l1VG+s0lea9qz8=",
 			"path": "golang.org/x/net/context",
-			"revision": "59a0b19b5533c7977ddeb86b017bf507ed407b12",
-			"revisionTime": "2017-06-03T08:13:02Z"
+			"revision": "a04bdaca5b32abe1c069418fb7088ae607de5bd0",
+			"revisionTime": "2017-10-03T05:09:24Z"
 		}
 	],
 	"rootPath": "github.com/hsl-gtfs-parser"

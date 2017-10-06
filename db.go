@@ -116,7 +116,8 @@ func InsertTransportNumbers(feed *parser.Feed, db *sql.DB) *map[string]int {
 	defer stmt.Close()
 
 	for routeKey := range feed.Routes {
-		_, err = stmt.Exec(id, feed.Routes[routeKey].Short_name, feed.Routes[routeKey].Long_name, 1 /* INSERT HERE PROPER VALUE */)
+
+		_, err = stmt.Exec(id, feed.Routes[routeKey].Short_name, feed.Routes[routeKey].Long_name, getTransportType(feed.Routes[routeKey].Type))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -253,4 +254,65 @@ func isWorkday(dayMap *[7]bool) int {
 // please refer to the unit tests
 func extractTime(time *gtfs.Time) int {
 	return (int(time.Hour) * 100) + int(time.Minute)
+}
+
+// getTransportType transcodes the GTFS types to the old HSL types.
+// Helsinki Timetables uses old types for trasport, so we analyze type
+// and change it to the expected.
+// All the GTFS types can be found here: https://developers.google.com/transit/gtfs/reference/#routestxt
+// (see route_type field) and extended types can be found here: https://developers.google.com/transit/gtfs/reference/extended-route-types
+func getTransportType(gtfsType int16) int16 {
+
+	/*
+		old types are
+
+			1, 'Bussiliikenne'
+			2, 'Raitiovaunuliikenne'
+			6, 'Metroliikenne'
+			7, 'Vesiliikenne'
+			8, 'U-liikenne'
+			12, 'Lähijunaliikenne'
+			21, 'Lähibussiliikenne'
+
+	*/
+
+	// standard
+	switch gtfsType {
+	case 0:
+		return 2
+	case 1:
+		return 6
+	case 2:
+		return 12
+	case 3:
+		return 1
+	case 4:
+		return 7
+	case 300:
+		return 12
+	case 500:
+		return 6
+	case 600:
+		return 6
+	case 1200:
+		return 7
+	}
+
+	// extended
+	switch {
+	case (gtfsType >= 100 && gtfsType < 200):
+		return 1
+	case (gtfsType >= 200 && gtfsType < 300):
+		return 21
+	case (gtfsType >= 400 && gtfsType < 500):
+		return 12
+	case (gtfsType >= 700 && gtfsType < 800):
+		return 1
+	case (gtfsType >= 800 && gtfsType < 900):
+		return 2
+	case (gtfsType >= 1000 && gtfsType < 1100):
+		return 2
+	}
+
+	return 1
 }
