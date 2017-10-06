@@ -43,16 +43,20 @@ func main() {
 		fmt.Println("3) insert transport types")
 		InsertVehicleTypes(db)
 
-		// 4) insert all the transport Numbers and route names
-		fmt.Println("4) instert transport numbers")
+		// 4) insert transport modes
+		fmt.Println("4) insert transport modes")
+		InsertTransportModes(db)
+
+		//5) insert all the transport Numbers and route names
+		fmt.Println("5) instert transport numbers")
 		mapRouteIds := InsertTransportNumbers(feed, db)
 
-		// 5) stations
-		fmt.Println("5) insert stations")
+		// 6) stations
+		fmt.Println("6) insert stations")
 		InsertStations(feed, db)
 
-		// 6) points
-		fmt.Println("6) insert trips points (bus stops)")
+		// 7) points
+		fmt.Println("7) insert trips points (bus stops)")
 		InsertTripsAndPoints(feed, db, mapRouteIds)
 
 		fmt.Println("Done")

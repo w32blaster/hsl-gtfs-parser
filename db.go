@@ -14,29 +14,27 @@ import (
 // CreateSchema : creates schema
 func CreateSchema(db *sql.DB) bool {
 
-	// these lines are ignored:
-	// DROP TABLE transport_mode;
-	// CREATE TABLE transport_mode (_id integer primary key autoincrement, name VARCHAR(50) not null,vehicle_type_id integer not null);
-	// CREATE INDEX idx4 ON transport_number(transport_mode_id);
-	// CREATE INDEX idx5 ON transport_mode(vehicle_type_id);
-	// (... ,transport_mode_id integer not null) from transport mode table
+	// Valid SQL to test:
+	// SELECT * FROM transport_mode as tm INNER JOIN transport_number as tn ON tm._id = tn.transport_mode_id WHERE tm.vehicle_type_id = 1 GROUP BY tm._id ORDER BY tm._id, tn.name;
 
 	sqlStmt := `
 	DROP TABLE IF EXISTS city;
 	DROP TABLE IF EXISTS station;
 	DROP TABLE IF EXISTS point;
 	DROP TABLE IF EXISTS transport_number;
+	DROP TABLE IF EXISTS transport_mode;
 	DROP TABLE IF EXISTS vehicle_type;
 	DROP TABLE IF EXISTS company;
 	DROP TABLE IF EXISTS trip;
 
-	CREATE TABLE city (_id integer primary key autoincrement, name VARCHAR(30) not null);
+	CREATE TABLE city (_id integer primary key, name VARCHAR(30) not null);
 	CREATE TABLE station (_id integer primary key, name VARCHAR(50) not null,city_id integer not null);
 	CREATE TABLE point (trip_id NUMERIC not null, station_id integer not null, time integer not null, idx integer not null);
-	CREATE TABLE transport_number (_id integer primary key autoincrement, name VARCHAR(30) not null,service_name VARCHAR(30) not null);
-	CREATE TABLE vehicle_type (_id integer primary key autoincrement, name VARCHAR(20) not null);
-	CREATE TABLE company (_id integer primary key autoincrement, name VARCHAR(50) not null);
-	CREATE TABLE trip (_id integer primary key autoincrement, company_id integer not null,station_id_start integer not null,station_id_end integer not null,is_workday BOOLEAN not null,is_saturday BOOLEAN not null,is_sunday BOOLEAN not null,transport_number_id integer not null);
+	CREATE TABLE transport_number (_id integer primary key, name VARCHAR(30) not null,service_name VARCHAR(30) not null, transport_mode_id integer not null);
+	CREATE TABLE transport_mode (_id integer primary key autoincrement, name VARCHAR(50) not null,vehicle_type_id integer not null);
+	CREATE TABLE vehicle_type (_id integer primary key, name VARCHAR(20) not null);
+	CREATE TABLE company (_id integer primary key, name VARCHAR(50) not null);
+	CREATE TABLE trip (_id integer primary key, company_id integer not null,station_id_start integer not null,station_id_end integer not null,is_workday BOOLEAN not null,is_saturday BOOLEAN not null,is_sunday BOOLEAN not null,transport_number_id integer not null);
 	
 	CREATE INDEX statNameIdx ON station(name);
 	CREATE INDEX idxPointTrip ON point( trip_id);
@@ -80,7 +78,7 @@ func InsertCompanies(feed *parser.Feed, db *sql.DB) bool {
 // https://developers.google.com/transit/gtfs/reference/routes-file#route_type
 func InsertVehicleTypes(db *sql.DB) bool {
 
-	_, err := db.Exec("insert into vehicle_type(_id, name) values(0, 'Tram'), (1, 'Metro'), (2, 'Trains'), (3, 'Bus'), (4, 'Ferry'), (5, 'Cable Cars'), (6, 'Gondola'), (7, 'Funicular')")
+	_, err := db.Exec("insert into vehicle_type(_id, name) values(1, 'Bus'), (2, 'Trains'), (3, 'Metro'), (4, 'Trams'), (5, 'Ferry'), (6, 'U-Lines'), (7, 'Cable Cars'), (8, 'Gondola'), (9, 'Funicular')")
 	if err != nil {
 		log.Fatal(err)
 		return false
@@ -90,8 +88,13 @@ func InsertVehicleTypes(db *sql.DB) bool {
 }
 
 // InsertTransportModes : insert cities to the database
-func InsertTransportModes() bool {
-	// obsolete database, needs to rethink what to do with it :( may be remove
+func InsertTransportModes(db *sql.DB) bool {
+	_, err := db.Exec("insert into transport_mode (_id, name, vehicle_type_id) values(1, 'Bussiliikenne', 1), (2, 'Raitiovaunuliikenne', 4), (6, 'Metroliikenne', 3), (7, 'Vesiliikenne', 5), (8, 'U-liikenne', 6), (12, 'Lähijunaliikenne', 2), (21, 'Lähibussiliikenne', 1)")
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
 	return false
 }
 
@@ -106,14 +109,14 @@ func InsertTransportNumbers(feed *parser.Feed, db *sql.DB) *map[string]int {
 	}
 
 	id := 0
-	stmt, err := tx.Prepare("insert into transport_number (_id, name, service_name) values(?, ?, ?)")
+	stmt, err := tx.Prepare("insert into transport_number (_id, name, service_name, transport_mode_id) values(?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer stmt.Close()
 
 	for routeKey := range feed.Routes {
-		_, err = stmt.Exec(id, feed.Routes[routeKey].Short_name, feed.Routes[routeKey].Long_name)
+		_, err = stmt.Exec(id, feed.Routes[routeKey].Short_name, feed.Routes[routeKey].Long_name, 1 /* INSERT HERE PROPER VALUE */)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -173,34 +176,37 @@ func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB, mapRouteIds *map[string
 	tripID := 0
 	for tripKey := range feed.Trips {
 
-		// get the first and the last station in the current trip
-		stationStart := feed.Trips[tripKey].StopTimes[0].Stop.Id
-		stopsCnt := len(feed.Trips[tripKey].StopTimes)
-		stationEnd := feed.Trips[tripKey].StopTimes[stopsCnt-1].Stop.Id
+		if isNotDublicate(&feed.Trips[tripKey].Service.Daymap) {
 
-		// find the dates (workdays, Saturday, Sunday)
-		isMonday := isWorkday(&feed.Trips[tripKey].Service.Daymap)
-		isSaturday := 0
-		if feed.Trips[tripKey].Service.Daymap[6] {
-			isSaturday = 1
+			// get the first and the last station in the current trip
+			stationStart := feed.Trips[tripKey].StopTimes[0].Stop.Id
+			stopsCnt := len(feed.Trips[tripKey].StopTimes)
+			stationEnd := feed.Trips[tripKey].StopTimes[stopsCnt-1].Stop.Id
+
+			// find the dates (workdays, Saturday, Sunday)
+			isMonday := isWorkday(&feed.Trips[tripKey].Service.Daymap)
+			isSaturday := 0
+			if feed.Trips[tripKey].Service.Daymap[6] {
+				isSaturday = 1
+			}
+
+			isSunday := 0
+			if feed.Trips[tripKey].Service.Daymap[0] {
+				isSunday = 1
+			}
+
+			// insert one trip
+			stmt.Exec(tripID, 1, stationStart, stationEnd, isMonday, isSaturday, isSunday, (*mapRouteIds)[feed.Trips[tripKey].Route.Id])
+
+			// iterate over all stops and insert them
+			insertPoints(tx, feed.Trips[tripKey].StopTimes, tripID)
+
+			tripID++
 		}
-
-		isSunday := 0
-		if feed.Trips[tripKey].Service.Daymap[0] {
-			isSunday = 1
-		}
-
-		// insert one trip
-		stmt.Exec(tripID, 1, stationStart, stationEnd, isMonday, isSaturday, isSunday, (*mapRouteIds)[feed.Trips[tripKey].Route.Id])
-
-		// iterate over all stops and insert them
-		insertPoints(tx, feed.Trips[tripKey].StopTimes, tripID)
-
-		tripID++
 	}
 
 	tx.Commit()
-	fmt.Println("   inserted " + strconv.Itoa(len(feed.Trips)) + " trips")
+	fmt.Println("   inserted " + strconv.Itoa(tripID) + " trips")
 	return true
 }
 
@@ -218,6 +224,17 @@ func insertPoints(tx *sql.Tx, stopTimes gtfs.StopTimes, tripID int) {
 	for _, stopTime := range stopTimes {
 		stmt.Exec(tripID, stopTime.Stop.Id, extractTime(&stopTime.Arrival_time), stopTime.Sequence)
 	}
+}
+
+// import contains record for all the days, but we combine Mo, Tu, We, Th and Fr as "workdays",
+// that's why each trip is dublicated for workdays 5 times. The simplest solution
+// would be to take only recored for Monday assuming that for the Tu,We,Th and Fr timetables are the same.
+// This method is used in order to take records only for Mon, Sun and Sat and ignore the rest of the days.
+func isNotDublicate(dayMap *[7]bool) bool {
+
+	// TRUE only if dayMap conains MON, SUN or SAT
+	// indexes could be find here: https://github.com/geops/gtfsparser/blob/master/mapping.go#L93
+	return dayMap[1] || dayMap[6] || dayMap[0]
 }
 
 // Showtcut method that returns 1 only when a trip is active in Wordays, 0 if not
