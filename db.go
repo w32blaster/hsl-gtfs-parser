@@ -238,7 +238,7 @@ func isNotDublicate(dayMap *[7]bool) bool {
 	return dayMap[1] || dayMap[6] || dayMap[0]
 }
 
-// Showtcut method that returns 1 only when a trip is active in Wordays, 0 if not
+// Shortcut method that returns 1 only when a trip is active in Wordays, 0 if not
 // please, refer to the mapping example here: https://github.com/geops/gtfsparser/blob/master/mapping.go#L93
 func isWorkday(dayMap *[7]bool) int {
 	if dayMap[1] || dayMap[2] || dayMap[3] || dayMap[4] || dayMap[5] {
@@ -256,8 +256,8 @@ func extractTime(time *gtfs.Time) int {
 	return (int(time.Hour) * 100) + int(time.Minute)
 }
 
-// getTransportType transcodes the GTFS types to the old HSL types.
-// Helsinki Timetables uses old types for trasport, so we analyze type
+// getTransportType maps the GTFS types to the old HSL types.
+// Helsinki Timetables uses old types for trasport which are less granular, than new onces. So we analyze given type
 // and change it to the expected.
 // All the GTFS types can be found here: https://developers.google.com/transit/gtfs/reference/#routestxt
 // (see route_type field) and extended types can be found here: https://developers.google.com/transit/gtfs/reference/extended-route-types
