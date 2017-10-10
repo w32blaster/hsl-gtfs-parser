@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 
+	sets "github.com/deckarep/golang-set"
 	_ "github.com/mattn/go-sqlite3"
 	parser "github.com/patrickbr/gtfsparser"
 	"github.com/patrickbr/gtfsparser/gtfs"
@@ -160,6 +161,8 @@ func InsertStations(feed *parser.Feed, db *sql.DB) bool {
 // InsertTripsAndPoints : insert cities to the database
 func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB, mapRouteIds *map[string]int) bool {
 
+	hasSet := sets.NewThreadUnsafeSet()
+
 	tx, err := db.Begin()
 
 	if err != nil {
@@ -175,6 +178,11 @@ func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB, mapRouteIds *map[string
 	defer stmt.Close()
 
 	tripID := 0
+	tripCount := len(feed.Trips)
+	dublicatesCnt := 0
+
+	uniqueSnapshot := ""
+
 	for tripKey := range feed.Trips {
 
 		if isNotDublicate(&feed.Trips[tripKey].Service.Daymap) {
@@ -196,13 +204,28 @@ func InsertTripsAndPoints(feed *parser.Feed, db *sql.DB, mapRouteIds *map[string
 				isSunday = 1
 			}
 
-			// insert one trip
-			stmt.Exec(tripID, 1, stationStart, stationEnd, isMonday, isSaturday, isSunday, (*mapRouteIds)[feed.Trips[tripKey].Route.Id])
+			// before that we need to check with the following SQL:
+			// SELECT count(*) as cnt FROM trip AS t INNER JOIN point AS p ON p.trip_id = t._id WHERE station_id_start=1520702 AND is_workday=1 AND is_saturday=0 AND is_sunday=0 AND p.time=0600;
+			firstStationTime := extractTime(&feed.Trips[tripKey].StopTimes[0].Arrival_time)
+			uniqueSnapshot = stationStart + "_" + stationEnd + "_" + strconv.Itoa(isMonday) + "_" + strconv.Itoa(isSaturday) + "_" + strconv.Itoa(isSunday) + "_" + strconv.Itoa(firstStationTime)
 
-			// iterate over all stops and insert them
-			insertPoints(tx, feed.Trips[tripKey].StopTimes, tripID)
+			if !hasSet.Contains(uniqueSnapshot) {
 
-			tripID++
+				// insert one trip
+				stmt.Exec(tripID, 1, stationStart, stationEnd, isMonday, isSaturday, isSunday, (*mapRouteIds)[feed.Trips[tripKey].Route.Id])
+
+				// iterate over all stops and insert them
+				insertPoints(tx, feed.Trips[tripKey].StopTimes, tripID)
+
+				if tripID%10 == 0 {
+					fmt.Printf("\r Inserted %d/%d (dublicates: %d)", tripID, tripCount, dublicatesCnt)
+				}
+
+				hasSet.Add(uniqueSnapshot)
+				tripID++
+			} else {
+				dublicatesCnt++
+			}
 		}
 	}
 

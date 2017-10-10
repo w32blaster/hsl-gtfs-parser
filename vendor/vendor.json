@@ -10,6 +10,12 @@
 			"revisionTime": "2017-10-02T20:02:53Z"
 		},
 		{
+			"checksumSHA1": "AHhRdnSt25KL4h34UqsDRUXUpRo=",
+			"path": "github.com/deckarep/golang-set",
+			"revision": "b3af78e1d186c53529e3c916055d734665f68121",
+			"revisionTime": "2017-08-26T19:28:09Z"
+		},
+		{
 			"checksumSHA1": "rjzryFC0SqhAolMhBBg+wraecS4=",
 			"path": "github.com/hsl-gtfs-parser",
 			"revision": "87bd39fd4f6ff99f13fb5b11db53a24db99b8d27",
