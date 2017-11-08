@@ -11,3 +11,9 @@ To install all the dependencies to your vendor folder, please use the command:
 '''
 $ govendor fetch +out
 '''
+
+Then you can build your app as usually. Make sure you have downkloaded the HSL.zip file using the link: https://api.digitransit.fi/routing-data/v2/hsl/HSL.zip
+
+# Build a container
+
+Please note, we use ["multi-stage build"](https://docs.docker.com/engine/userguide/eng-image/multistage-build/), that requires the latest version of Docker-ce. To build, use `docker build .`

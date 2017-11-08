@@ -3,61 +3,197 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "mrz/kicZiUaHxkyfvC/DyQcr8Do=",
+			"path": "C",
+			"revision": ""
+		},
+		{
+			"path": "archive/zip",
+			"revision": ""
+		},
+		{
+			"path": "bufio",
+			"revision": ""
+		},
+		{
+			"path": "bytes",
+			"revision": ""
+		},
+		{
+			"path": "context",
+			"revision": ""
+		},
+		{
+			"path": "database/sql",
+			"revision": ""
+		},
+		{
+			"path": "database/sql/driver",
+			"revision": ""
+		},
+		{
+			"path": "encoding/csv",
+			"revision": ""
+		},
+		{
+			"path": "encoding/hex",
+			"revision": ""
+		},
+		{
+			"path": "encoding/json",
+			"revision": ""
+		},
+		{
+			"path": "errors",
+			"revision": ""
+		},
+		{
+			"path": "fmt",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "OFu4xJEIjiI8Suu+j/gabfp+y6Q=",
 			"origin": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
 			"path": "github.com/davecgh/go-spew/spew",
-			"revision": "ecdeabc65495df2dec95d7c4a4c3e021903035e5",
-			"revisionTime": "2017-10-02T20:02:53Z"
+			"revision": "2aa2c176b9dab406a6970f6a55f513e8a8c8b18f",
+			"revisionTime": "2017-08-14T20:04:35Z"
 		},
 		{
-			"checksumSHA1": "AHhRdnSt25KL4h34UqsDRUXUpRo=",
+			"checksumSHA1": "LE/UfJmiAXFbHwf4fNIRnFuMHUM=",
 			"path": "github.com/deckarep/golang-set",
-			"revision": "b3af78e1d186c53529e3c916055d734665f68121",
-			"revisionTime": "2017-08-26T19:28:09Z"
-		},
-		{
-			"checksumSHA1": "rjzryFC0SqhAolMhBBg+wraecS4=",
-			"path": "github.com/hsl-gtfs-parser",
-			"revision": "87bd39fd4f6ff99f13fb5b11db53a24db99b8d27",
-			"revisionTime": "2017-10-06T18:02:18Z"
+			"revision": "1d4478f51bed434f1dadf96dcd9b43aabac66795",
+			"revisionTime": "2017-10-13T11:49:54Z"
 		},
 		{
 			"checksumSHA1": "vJOfjdXbjymKpuay2nyRnGncJUw=",
 			"path": "github.com/mattn/go-sqlite3",
-			"revision": "5160b48509cf5c877bc22c11c373f8c7738cdb38",
-			"revisionTime": "2017-09-28T04:00:20Z"
+			"revision": "615c193e01d8d462eef7ee390171506f531a1c9a",
+			"revisionTime": "2017-10-24T02:57:10Z"
 		},
 		{
-			"checksumSHA1": "LYKJISxnOfk8V/U/E6k16MkeZX4=",
+			"checksumSHA1": "wqZe43k+bhiaeW+OCy/JsXknkQg=",
 			"path": "github.com/patrickbr/gtfsparser",
-			"revision": "6e4f12215933aeb8ac2cab2c4823a1d17b6f95f5",
-			"revisionTime": "2017-07-19T21:37:55Z"
+			"revision": "3edffe8712b56f8702be2d6bd95c8b2b16cb203a",
+			"revisionTime": "2017-11-07T00:39:52Z"
 		},
 		{
-			"checksumSHA1": "qZS7WHo289pKhIEMPkuVjp77ceI=",
+			"checksumSHA1": "MX4a6ph9m+GBIoaHIpepI9B4IM8=",
 			"path": "github.com/patrickbr/gtfsparser/gtfs",
-			"revision": "6e4f12215933aeb8ac2cab2c4823a1d17b6f95f5",
-			"revisionTime": "2017-07-19T21:37:55Z"
+			"revision": "3edffe8712b56f8702be2d6bd95c8b2b16cb203a",
+			"revisionTime": "2017-11-07T00:39:52Z"
 		},
 		{
-			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
+			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
 			"origin": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
 			"path": "github.com/pmezard/go-difflib/difflib",
-			"revision": "792786c7400a136282c1664665ae0a8db921c6c2",
-			"revisionTime": "2016-01-10T10:55:54Z"
+			"revision": "2aa2c176b9dab406a6970f6a55f513e8a8c8b18f",
+			"revisionTime": "2017-08-14T20:04:35Z"
 		},
 		{
 			"checksumSHA1": "mGbTYZ8dHVTiPTTJu3ktp+84pPI=",
 			"path": "github.com/stretchr/testify/assert",
-			"revision": "890a5c3458b43e6104ff5da8dfa139d013d77544",
-			"revisionTime": "2017-07-05T02:17:15Z"
+			"revision": "2aa2c176b9dab406a6970f6a55f513e8a8c8b18f",
+			"revisionTime": "2017-08-14T20:04:35Z"
 		},
 		{
-			"checksumSHA1": "dr5+PfIRzXeN+l1VG+s0lea9qz8=",
+			"checksumSHA1": "SffwOUpHrUTNdcqseglVjGw86Nw=",
+			"path": "github.com/w32blaster/hsl-gtfs-parser",
+			"revision": "32164e3966168878a35ba94278780f3bcfbeb9aa",
+			"revisionTime": "2017-10-10T13:36:59Z"
+		},
+		{
+			"path": "github.com/w32blaster/hsl-gtfs-parser",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "GtamqiJoL7PGHsN454AoffBFMa8=",
 			"path": "golang.org/x/net/context",
-			"revision": "a04bdaca5b32abe1c069418fb7088ae607de5bd0",
-			"revisionTime": "2017-10-03T05:09:24Z"
+			"revision": "a337091b0525af65de94df2eb7e98bd9962dcbe2",
+			"revisionTime": "2016-10-09T20:39:03Z"
+		},
+		{
+			"path": "io",
+			"revision": ""
+		},
+		{
+			"path": "log",
+			"revision": ""
+		},
+		{
+			"path": "math",
+			"revision": ""
+		},
+		{
+			"path": "net/http",
+			"revision": ""
+		},
+		{
+			"path": "net/http/httptest",
+			"revision": ""
+		},
+		{
+			"path": "net/mail",
+			"revision": ""
+		},
+		{
+			"path": "net/url",
+			"revision": ""
+		},
+		{
+			"path": "os",
+			"revision": ""
+		},
+		{
+			"path": "path",
+			"revision": ""
+		},
+		{
+			"path": "reflect",
+			"revision": ""
+		},
+		{
+			"path": "regexp",
+			"revision": ""
+		},
+		{
+			"path": "runtime",
+			"revision": ""
+		},
+		{
+			"path": "sort",
+			"revision": ""
+		},
+		{
+			"path": "strconv",
+			"revision": ""
+		},
+		{
+			"path": "strings",
+			"revision": ""
+		},
+		{
+			"path": "sync",
+			"revision": ""
+		},
+		{
+			"path": "testing",
+			"revision": ""
+		},
+		{
+			"path": "time",
+			"revision": ""
+		},
+		{
+			"path": "unicode",
+			"revision": ""
+		},
+		{
+			"path": "unicode/utf8",
+			"revision": ""
+		},
+		{
+			"path": "unsafe",
+			"revision": ""
 		}
 	],
-	"rootPath": "github.com/hsl-gtfs-parser"
+	"rootPath": "github.com/w32blaster/hsl-gtfs-parser"
 }
