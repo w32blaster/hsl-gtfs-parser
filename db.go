@@ -90,7 +90,16 @@ func InsertVehicleTypes(db *sql.DB) bool {
 
 // InsertTransportModes : insert cities to the database
 func InsertTransportModes(db *sql.DB) bool {
-	_, err := db.Exec("insert into transport_mode (_id, name, vehicle_type_id) values(1, 'Bussiliikenne', 1), (2, 'Raitiovaunuliikenne', 4), (6, 'Metroliikenne', 3), (7, 'Vesiliikenne', 5), (8, 'U-liikenne', 6), (12, 'Lähijunaliikenne', 2), (21, 'Lähibussiliikenne', 1)")
+	_, err := db.Exec(`insert into transport_mode (_id, name, vehicle_type_id) values
+						(1, 'Bussiliikenne', 1), 
+						(2, 'Raitiovaunuliikenne', 4), 
+						(6, 'Metroliikenne', 3), 
+						(7, 'Vesiliikenne', 5), 
+						(8, 'U-liikenne', 6), 
+						(12, 'Lähijunaliikenne', 2), 
+						(21, 'Lähibussiliikenne', 1),
+						(22, 'Pikabussiliikenne', 1),
+						(23, 'Paikallisliikenne', 1)`)
 	if err != nil {
 		log.Fatal(err)
 		return false
@@ -296,6 +305,8 @@ func getTransportType(gtfsType int16) int16 {
 			8, 'U-liikenne'
 			12, 'Lähijunaliikenne'
 			21, 'Lähibussiliikenne'
+			22, 'Pikabussiliikenne'
+			23, 'Paikallisliikenne'
 
 	*/
 
@@ -324,17 +335,27 @@ func getTransportType(gtfsType int16) int16 {
 	// extended
 	switch {
 	case (gtfsType >= 100 && gtfsType < 200):
-		return 1
+		return 12
 	case (gtfsType >= 200 && gtfsType < 300):
 		return 21
-	case (gtfsType >= 400 && gtfsType < 500):
+	case (gtfsType >= 300 && gtfsType < 500):
 		return 12
+	case (gtfsType >= 500 && gtfsType <= 600):
+		return 6 // Metro
+	case gtfsType == 700:
+		return 1 // Bus
+	case gtfsType == 701:
+		return 23 // Regional bus
+	case gtfsType == 702:
+		return 22 // Express bus
+	case gtfsType == 704:
+		return 21 // Local bus
 	case (gtfsType >= 700 && gtfsType < 800):
-		return 1
-	case (gtfsType >= 800 && gtfsType < 900):
-		return 2
+		return 1 // other bus
+	case (gtfsType >= 900 && gtfsType < 1000):
+		return 2 // Tram
 	case (gtfsType >= 1000 && gtfsType < 1100):
-		return 2
+		return 7 // Ferry
 	}
 
 	return 1

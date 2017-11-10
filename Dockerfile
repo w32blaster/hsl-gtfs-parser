@@ -25,7 +25,7 @@ COPY --from=builder /go/src/github.com/w32blaster/hsl-gfts-parser/hsl-parser /ro
 RUN apk update && \
 
     # install SQlite3 to set up a new database
-    apk add --no-cache sqlite wget ca-certificates && \
+    apk add --no-cache sqlite wget ca-certificates zip unzip && \
 
     # clean up
     rm -rf /tmp/* && \
@@ -34,7 +34,15 @@ RUN apk update && \
     mkdir -p /root/db && \
 
     # make parser runnable
-    chmod +x /root/hsl-parser
+    chmod +x /root/hsl-parser && \
+
+    # add few useful aliases to print colored messages to stdout in non-interactive mode
+    echo -e '#!/bin/sh\n printf "\033[1;32m$* \033[0m \n"' > /usr/bin/printGreenln && \
+    chmod +x /usr/bin/printGreenln && \
+
+    # function to get size of a file
+    echo -e '#!/bin/sh\n echo `du -h $1 | cut -f1`'  > /usr/bin/getSize && \
+    chmod +x /usr/bin/getSize
 
 WORKDIR /root
 CMD ["./hsl-parser"]
