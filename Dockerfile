@@ -17,6 +17,7 @@ RUN cd /go/src/github.com/w32blaster/hsl-gfts-parser/ && \
 
 RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o hsl-parser .
 
+
 # Stage 2: runtime container
 FROM alpine:latest
 
@@ -25,7 +26,7 @@ COPY --from=builder /go/src/github.com/w32blaster/hsl-gfts-parser/hsl-parser /ro
 RUN apk update && \
 
     # install SQlite3 to set up a new database
-    apk add --no-cache sqlite wget ca-certificates zip unzip && \
+    apk add --no-cache sqlite wget ca-certificates zip unzip lftp && \
 
     # clean up
     rm -rf /tmp/* && \
