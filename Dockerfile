@@ -22,6 +22,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o hsl-parser .
 FROM alpine:latest
 
 COPY --from=builder /go/src/github.com/w32blaster/hsl-gfts-parser/hsl-parser /root/
+ADD build.sh /root/build.sh
 
 RUN apk update && \
 
@@ -36,6 +37,7 @@ RUN apk update && \
 
     # make parser runnable
     chmod +x /root/hsl-parser && \
+    chmod +x /root/build.sh && \
 
     # add few useful aliases to print colored messages to stdout in non-interactive mode
     echo -e '#!/bin/sh\n printf "\033[1;32m$* \033[0m \n"' > /usr/bin/printGreenln && \

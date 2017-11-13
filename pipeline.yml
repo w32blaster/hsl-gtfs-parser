@@ -1,73 +1,61 @@
 ---
 
+resource_types:
+
+# Send notifications to the Telegram
+- name: telegram-notification
+  type: docker-image
+  source:
+    repository: w32blaster/concourse-telegram-notifier
+    tag: latest
+
+
+resources:
+
+- name: after-midnight
+  type: time
+  source:
+    start: 1:00 AM
+    stop: 2:00 AM
+#    days: [Monday, Friday]
+
+- name: telegram-notification
+  type: telegram-notification
+  source:
+    bot_token: ((bot-token))
+
 jobs:
 - name: "HSL parse"
   public: true
   plan:
 
+  - get: after-midnight
+    trigger: true
+
   # Build
   - task: "Download and parse HSL data"
+    params:
+      HSL_FTP_HOSTNAME: ((ftp-hostname))
+      HSL_FTP_USERNAME: ((ftp-user))
+      HSL_FTP_PASSWORD: ((ftp-password))
     config:
       platform: linux
       image_resource:
         type: docker-image
         source: {repository: "w32blaster/hsl-gtfs-parser", tag: "latest" }
-
+      
       run:
-        path: sh
-        args:
-        - -ec
-        - |
-          
-          cd /root
+        path: /root/build.sh  
 
-          # functions printGreenln and getSize are coming from the w32blaster/hsl-gtfs-parser image
+    on_failure:
+      put: telegram-notification
+      params:
+        chat_id: ((chat-id))
+        text: " 🔴 Achtung! HSL file uploading was failed! [Build $BUILD_NAME](http://ci.daxi.meibe.eu:8080/teams/main/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME)"
 
-          printGreenln "◆ Download the HSL archive from Reittiopas website"
-          wget --no-check-certificate https://api.digitransit.fi/routing-data/v2/hsl/HSL.zip
+  # Send message to Telegram that everything is fine
+  - put: telegram-notification
+    params:
+      chat_id: ((chat-id))
+      text: "✅ HSL db file was updated"
 
-          printGreenln "◆ Correct the URL in the file feed_info.txt, because in this case parser can't parse the file"
-          unzip -j HSL.zip feed_info.txt
-
-          # replace HSL-fake-url with any URL. It doesn't affect any logic, simply makes validator happy
-          sed -i 's/HSL-fake-url/http:\/\/hsl.fi/' feed_info.txt
-          zip -u HSL.zip feed_info.txt
-
-          printGreenln "◆ Parse it"
-          /root/hsl-parser
-
-          printGreenln "◆ Shrink the database (VACUUM)"
-          echo `date +%T`" Before: " `stat -c %s /root/db/helsinki_timetables.sqlite` "("`getSize /root/db/helsinki_timetables.sqlite`")"
-          sqlite3 /root/db/helsinki_timetables.sqlite 'VACUUM;'
-          echo `date +%T`" After:  " `stat -c %s /root/db/helsinki_timetables.sqlite` "("`getSize /root/db/helsinki_timetables.sqlite`")"
-
-          printGreenln "◆ Create archive hsl.gz:"
-          gzip -cv /root/db/helsinki_timetables.sqlite > /root/hsl.gz
-          
-          printGreenln "◆ Make a version.xml file with meta data"
-          checksum=`md5sum /root/hsl.gz`
-          
-          printGreenln "◆ check the result file size. If it bigger than 100Mb or less than 40Mb, then mark report letter header as 'WARNING', or 'INFO' otherwise"
-          DB_RESULT_FILE_SIZE=`stat -c %s /root/db/helsinki_timetables.sqlite`
-          let "MAX_SIZE=90*1024*1024" #90Mb
-          let "MIN_SIZE=40*1024*1024" #40Mb
-
-          errorMessage=""
-          isRecommended=false
-          if [ "$DB_RESULT_FILE_SIZE" -gt "$MAX_SIZE" ]
-          then
-             isRecommended=false
-             errorMessage="the database is too big. It probably contains some duplicated data."
-          elif [ "$DB_RESULT_FILE_SIZE" -lt "$MIN_SIZE" ]
-          then
-             isRecommended=false
-             errorMessage="the database is too small. Probably it is corrupted."
-          else
-             isRecommended=true
-          fi
-
-          printGreenln "◆ generate version.xml with meta-data"
-          echo '<?xml version="1.0" encoding="utf-8"?><metadata description="Meta data of the available Sqlite database"><date-gen description="The day of Sqlite database generation">'`date +%F"_"%T`'</date-gen><date-export description="The day, when the data was exported from the HSL servers">'$DATE_OF_EXPORT'</date-export><md5>'${checksum%  *}'</md5><size-db>'$DB_RESULT_FILE_SIZE'</size-db><size-gz>'`stat -c %s /root/hsl.gz`'</size-gz><size-db-h>'`getSize /root/db/helsinki_timetables.sqlite`'</size-db-h><recommended description="Is the current database recommended to be downloaded?">'$isRecommended'</recommended><error-message description="Error message that describes what is wrong with the database">'$errorMessage'</error-message><info-message></info-message></metadata>' >> /root/version.xml 
-
-          cat /root/version.xml
-          
