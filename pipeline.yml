@@ -17,7 +17,7 @@ resources:
   source:
     start: 1:00 AM
     stop: 2:00 AM
-#    days: [Monday, Friday]
+    days: [Monday, Friday]
 
 - name: telegram-notification
   type: telegram-notification
@@ -30,7 +30,7 @@ jobs:
   plan:
 
   - get: after-midnight
-    trigger: true
+    trigger: true  
 
   # Build
   - task: "Download and parse HSL data"
@@ -57,5 +57,5 @@ jobs:
   - put: telegram-notification
     params:
       chat_id: ((chat-id))
-      text: "✅ HSL db file was updated"
+      text: "✅ HSL db file was updated and deployed to the server"
 

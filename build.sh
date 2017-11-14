@@ -59,7 +59,7 @@ printGreenln "◆ generate version.xml with meta-data"
 echo -e '<?xml version="1.0" encoding="utf-8"?>' \
           '<metadata description="Meta data of the available Sqlite database">' \
              '<date-gen description="The day of Sqlite database generation">'`date +%F"_"%T`'</date-gen>' \
-             '<date-export description="The day, when the data was exported from the HSL servers">'$DATE_OF_EXPORT'</date-export>' \
+             '<date-export description="The day, when the data was exported from the HSL servers">'`date +%F"_"%T`'</date-export>' \
              '<md5>'${checksum%  *}'</md5>' \
              '<size-db>'$DB_RESULT_FILE_SIZE'</size-db>' \
              '<size-gz>'`stat -c %s /root/hsl.gz`'</size-gz>' \
@@ -69,11 +69,14 @@ echo -e '<?xml version="1.0" encoding="utf-8"?>' \
              '<info-message></info-message>' \
          '</metadata>' >> /root/version.xml 
 
-
 # Finally, upload it
 printGreenln "◆ upload two files to FTP"
 LFTP_COMMAND="set ftp:ssl-allow no;
    open -u $HSL_FTP_USERNAME,$HSL_FTP_PASSWORD $HSL_FTP_HOSTNAME;
+   delete /hsl/downloads/version.xml.backup;
+   delete /hsl/downloads/hsl.gz.backup;
+   rename /hsl/downloads/version.xml /hsl/downloads/version.xml.backup;
+   rename /hsl/downloads/hsl.gz /hsl/downloads/hsl.gz.backup;
    put -O /hsl/downloads /root/version.xml;
    put -O /hsl/downloads /root/hsl.gz;
    quit"
