@@ -36,10 +36,16 @@ gzip -cv /root/db/helsinki_timetables.sqlite > /root/hsl.gz
 printGreenln "◆ Make a version.xml file with meta data"
 checksum=`md5sum /root/hsl.gz`
 
-printGreenln "◆ check the result file size. If it bigger than 100Mb or less than 40Mb, then mark report letter header as 'WARNING', or 'INFO' otherwise"
+printGreenln "◆ Check the result file size. If it bigger than 100Mb or less than 40Mb, then mark report letter header as 'WARNING', or 'INFO' otherwise"
 DB_RESULT_FILE_SIZE=`stat -c %s /root/db/helsinki_timetables.sqlite`
-let "MAX_SIZE=90*1024*1024" #90Mb
+let "MAX_SIZE=110*1024*1024" #110Mb
 let "MIN_SIZE=40*1024*1024" #40Mb
+
+# Parse the version.txt file and print it in our format
+printGreenln "◆ Download the version.txt"
+wget https://api.digitransit.fi/routing-data/v2/hsl/version.txt
+versionDate=$(cat version.txt)
+versionFinalDate=$(date --date="$versionDate" "+%Y-%m-%d_%H:%M:%S")
 
 errorMessage=""
 isRecommended=false
@@ -59,7 +65,7 @@ printGreenln "◆ generate version.xml with meta-data"
 echo -e '<?xml version="1.0" encoding="utf-8"?>' \
           '<metadata description="Meta data of the available Sqlite database">' \
              '<date-gen description="The day of Sqlite database generation">'`date +%F"_"%T`'</date-gen>' \
-             '<date-export description="The day, when the data was exported from the HSL servers">'`date +%F"_"%T`'</date-export>' \
+             '<date-export description="The day, when the data was exported from the HSL servers">'$versionFinalDate'</date-export>' \
              '<md5>'${checksum%  *}'</md5>' \
              '<size-db>'$DB_RESULT_FILE_SIZE'</size-db>' \
              '<size-gz>'`stat -c %s /root/hsl.gz`'</size-gz>' \
@@ -73,10 +79,10 @@ echo -e '<?xml version="1.0" encoding="utf-8"?>' \
 printGreenln "◆ upload two files to FTP"
 LFTP_COMMAND="set ftp:ssl-allow no;
    open -u $HSL_FTP_USERNAME,$HSL_FTP_PASSWORD $HSL_FTP_HOSTNAME;
-   delete /hsl/downloads/version.xml.backup;
-   delete /hsl/downloads/hsl.gz.backup;
-   rename /hsl/downloads/version.xml /hsl/downloads/version.xml.backup;
-   rename /hsl/downloads/hsl.gz /hsl/downloads/hsl.gz.backup;
+   rm /hsl/downloads/version.xml.backup;
+   rm /hsl/downloads/hsl.gz.backup;
+   mv /hsl/downloads/version.xml /hsl/downloads/version.xml.backup;
+   mv /hsl/downloads/hsl.gz /hsl/downloads/hsl.gz.backup;
    put -O /hsl/downloads /root/version.xml;
    put -O /hsl/downloads /root/hsl.gz;
    quit"
