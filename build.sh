@@ -46,6 +46,7 @@ printGreenln "◆ Download the version.txt"
 wget https://api.digitransit.fi/routing-data/v2/hsl/version.txt
 versionDate=$(cat version.txt)
 versionFinalDate=$(date --date="$versionDate" "+%Y-%m-%d_%H:%M:%S")
+echo "Data from version.txt file is: $versionDate and the formatted date is: $versionFinalDate"
 
 errorMessage=""
 isRecommended=false

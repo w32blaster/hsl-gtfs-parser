@@ -1,4 +1,7 @@
+#
 # Stage 1: build
+#          download dependencies using govendor and compile the go application
+#
 FROM w32blaster/go-govendor as builder
 
 RUN mkdir -p /go/src/github.com/w32blaster/hsl-gfts-parser/vendor
@@ -18,7 +21,9 @@ RUN cd /go/src/github.com/w32blaster/hsl-gfts-parser/ && \
 RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o hsl-parser .
 
 
+#
 # Stage 2: runtime container
+#
 FROM alpine:latest
 
 COPY --from=builder /go/src/github.com/w32blaster/hsl-gfts-parser/hsl-parser /root/
@@ -27,7 +32,8 @@ ADD build.sh /root/build.sh
 RUN apk update && \
 
     # install SQlite3 to set up a new database
-    apk add --no-cache sqlite wget ca-certificates zip unzip lftp && \
+    # "coreutils" is to use proper version of the "date" function
+    apk add --no-cache sqlite wget ca-certificates zip unzip lftp coreutils && \
 
     # clean up
     rm -rf /tmp/* && \
