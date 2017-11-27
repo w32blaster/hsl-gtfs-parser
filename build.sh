@@ -43,7 +43,7 @@ let "MIN_SIZE=40*1024*1024" #40Mb
 
 # Parse the version.txt file and print it in our format
 printGreenln "◆ Download the version.txt"
-wget https://api.digitransit.fi/routing-data/v2/hsl/version.txt
+wget -q https://api.digitransit.fi/routing-data/v2/hsl/version.txt
 versionDate=$(cat version.txt)
 versionFinalDate=$(date --date="$versionDate" "+%Y-%m-%d_%H:%M:%S")
 echo "Data from version.txt file is: $versionDate and the formatted date is: $versionFinalDate"

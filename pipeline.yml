@@ -22,7 +22,7 @@ resources:
 - name: telegram-notification
   type: telegram-notification
   source:
-    bot_token: ((bot-token))
+    bot_token: ((bot-key))
 
 jobs:
 - name: "HSL parse"
