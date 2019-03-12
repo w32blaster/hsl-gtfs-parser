@@ -76,9 +76,6 @@ echo -e '<?xml version="1.0" encoding="utf-8"?>' \
              '<info-message></info-message>' \
          '</metadata>' >> /root/version.xml 
 
-cp /root/hsl.gz /hsl-ready-files/
-cp /root/version.xml /hsl-ready-files/
-
 # Finally, upload it
 # printGreenln "◆ upload two files to FTP"
 #LFTP_COMMAND="set ftp:ssl-allow no;

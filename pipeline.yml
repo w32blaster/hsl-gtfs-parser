@@ -20,8 +20,8 @@ resources:
   type: time
   source:
     start: 1:00 AM
-    stop: 2:00 AM
     days: [Monday, Friday]
+    stop: 2:00 AM
 
 - name: telegram-notification
   type: telegram-notification
@@ -55,11 +55,20 @@ jobs:
         type: docker-image
         source: {repository: "w32blaster/hsl-gtfs-parser", tag: "latest" }
       
-      output:
-      - hsl-ready-files
+      outputs:
+        - name: hsl-ready-files
 
       run:
-        path: /root/build.sh
+        path: sh
+        args:
+          - -exc
+          - |
+            echo "---- Rub build scripts" 
+            /root/build.sh
+
+            echo "---- Copy generated files to output folder"
+            cp /root/hsl.gz hsl-ready-files/
+            cp /root/version.xml hsl-ready-files/
 
     on_failure:
       put: telegram-notification
@@ -67,7 +76,7 @@ jobs:
         chat_id: ((chat-id))
         text: " 🔴 Achtung! HSL file uploading was failed! [Build $BUILD_NAME](http://ci.daxi.meibe.eu:8080/teams/main/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME)"
 
-  - put: cert-target-server
+  - put: hsl-target-server
     params:
       files: 
         hsl-ready-files/version.xml: "/home/w32blaster/www/hsl/version.xml"
