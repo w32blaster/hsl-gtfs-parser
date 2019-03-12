@@ -76,16 +76,19 @@ echo -e '<?xml version="1.0" encoding="utf-8"?>' \
              '<info-message></info-message>' \
          '</metadata>' >> /root/version.xml 
 
-# Finally, upload it
-printGreenln "◆ upload two files to FTP"
-LFTP_COMMAND="set ftp:ssl-allow no;
-   open -u $HSL_FTP_USERNAME,$HSL_FTP_PASSWORD $HSL_FTP_HOSTNAME;
-   rm /hsl/downloads/version.xml.backup;
-   rm /hsl/downloads/hsl.gz.backup;
-   mv /hsl/downloads/version.xml /hsl/downloads/version.xml.backup;
-   mv /hsl/downloads/hsl.gz /hsl/downloads/hsl.gz.backup;
-   put -O /hsl/downloads /root/version.xml;
-   put -O /hsl/downloads /root/hsl.gz;
-   quit"
+cp /root/hsl.gz /hsl-ready-files/
+cp /root/version.xml /hsl-ready-files/
 
-lftp -c "$LFTP_COMMAND"
+# Finally, upload it
+# printGreenln "◆ upload two files to FTP"
+#LFTP_COMMAND="set ftp:ssl-allow no;
+#   open -u $HSL_FTP_USERNAME,$HSL_FTP_PASSWORD $HSL_FTP_HOSTNAME;
+#   rm /hsl/downloads/version.xml.backup;
+#   rm /hsl/downloads/hsl.gz.backup;
+#   mv /hsl/downloads/version.xml /hsl/downloads/version.xml.backup;
+#   mv /hsl/downloads/hsl.gz /hsl/downloads/hsl.gz.backup;
+#   put -O /hsl/downloads /root/hsl.gz;
+#   put -O /hsl/downloads /root/version.xml;
+#   quit"
+
+#lftp -c "$LFTP_COMMAND"

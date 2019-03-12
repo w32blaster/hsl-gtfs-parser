@@ -9,6 +9,10 @@ resource_types:
     repository: w32blaster/concourse-telegram-notifier
     tag: latest
 
+- name: concourse-ssh-scp-resource
+  type: docker-image
+  source:
+    repository: danrspencer/concourse-ssh-scp-resource
 
 resources:
 
@@ -23,6 +27,13 @@ resources:
   type: telegram-notification
   source:
     bot_token: ((bot-key))
+
+- name: hsl-target-server
+  type: concourse-ssh-scp-resource
+  source:
+    host: ((hsl_host))
+    user: ((hsl_user))
+    private_key: ((ops-private-repo-key))
 
 jobs:
 - name: "HSL parse"
@@ -44,14 +55,28 @@ jobs:
         type: docker-image
         source: {repository: "w32blaster/hsl-gtfs-parser", tag: "latest" }
       
+      output:
+      - hsl-ready-files
+
       run:
-        path: /root/build.sh  
+        path: /root/build.sh
 
     on_failure:
       put: telegram-notification
       params:
         chat_id: ((chat-id))
         text: " 🔴 Achtung! HSL file uploading was failed! [Build $BUILD_NAME](http://ci.daxi.meibe.eu:8080/teams/main/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME)"
+
+  - put: cert-target-server
+    params:
+      files: 
+        hsl-ready-files/version.xml: "/home/w32blaster/www/hsl/version.xml"
+        hsl-ready-files/hsl.gz: "/home/w32blaster/www/hsl/hsl.gz"
+      commands: [
+        "echo \"---- Current content of www/hsl: \"",
+        "ls /home/w32blaster/www/hsl"
+      ]
+
 
   # Send message to Telegram that everything is fine
   - put: telegram-notification
