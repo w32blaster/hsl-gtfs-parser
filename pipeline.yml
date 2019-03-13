@@ -81,11 +81,6 @@ jobs:
       files: 
         hsl-ready-files/version.xml: "/home/w32blaster/www/hsl/version.xml"
         hsl-ready-files/hsl.gz: "/home/w32blaster/www/hsl/hsl.gz"
-      commands: [
-        "echo \"---- Current content of www/hsl: \"",
-        "ls /home/w32blaster/www/hsl"
-      ]
-
 
   # Send message to Telegram that everything is fine
   - put: telegram-notification
